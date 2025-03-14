@@ -12,6 +12,7 @@ on:
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,9 +24,9 @@ jobs:
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git config user.name "${{ github.actor }}"
 
-      - name: Merge to dev
+      - name: Merge to Dev
         run: |
-          git checkout dev
-          git pull origin dev
+          git checkout Dev
+          git pull origin Dev
           git merge --no-ff "origin/${GITHUB_REF#refs/heads/}"
-          git push origin dev
+          git push origin Dev

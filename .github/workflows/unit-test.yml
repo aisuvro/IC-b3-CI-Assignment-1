@@ -50,7 +50,6 @@ jobs:
                 php -r "file_exists('.env') || copy('.env.example', '.env');"
                 php artisan key:generate
                 chmod -R 777 storage bootstrap/cache storage
-                chown -R $USER:$USER storage bootstrap/cache storage
                 php artisan migrate --force
 
 
