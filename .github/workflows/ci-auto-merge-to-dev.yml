@@ -1,0 +1,27 @@
+name: Auto Merge Feature to Dev
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for accurate merge detection
+
+      - name: Set up Git config
+        run: |
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git config user.name "${{ github.actor }}"
+
+      - name: Merge to dev
+        run: |
+          git checkout dev
+          git pull origin dev
+          git merge --no-ff "origin/${GITHUB_REF#refs/heads/}"
+          git push origin dev
