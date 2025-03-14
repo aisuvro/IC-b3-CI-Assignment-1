@@ -1,0 +1,57 @@
+name: Laravel code test
+
+on:
+    push:
+        branches: 
+            - main/*
+    
+    pull_request:
+        branches:
+            - feature/*
+
+jobs:
+    test-code:
+        name: Environment setup for ${{ matrix.os }} PHP ${{ matrix.php-versions }}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest]
+                php-versions: [8.2, 8.3]
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            # Docs: https://github.com/shivammathur/setup-php
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                php-version: ${{ matrix.php-versions }}
+                extensions: mbstring, dom, fileinfo
+                coverage: xdebug
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache composer dependencies
+              uses: actions/cache@v3
+              with:
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install Composer dependencies
+              run: composer install --no-progress --prefer-dist --optimize-autoloader
+
+            - name: Prepare the application
+              run: |
+                php -r "file_exists('.env') || copy('.env.example', '.env');"
+                php artisan key:generate
+
+            - name: Clear Config
+              run: php artisan config:clear
+
+            - name: Test with phpunit
+              run: vendor/bin/phpunit --coverage-text
