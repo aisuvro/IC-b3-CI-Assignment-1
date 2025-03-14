@@ -3,28 +3,28 @@ name: Laravel code test
 on:
     push:
         branches: 
-            - main/*
+            - feature/*
     
     pull_request:
         branches:
             - feature/*
 
 jobs:
-    test-code:
+    unit-test:
         name: Environment setup for ${{ matrix.os }} PHP ${{ matrix.php-versions }}
         runs-on: ${{ matrix.os }}
         strategy:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest]
-                php-versions: [8.2, 8.3]
+                php-versions: [8.3]
 
         steps:
             - name: Checkout
               uses: actions/checkout@v4
 
             # Docs: https://github.com/shivammathur/setup-php
-            - name: Setup PHP
+            - name: Setup PHP ${{ matrix.php-versions }}
               uses: shivammathur/setup-php@v2
               with:
                 php-version: ${{ matrix.php-versions }}
@@ -54,4 +54,4 @@ jobs:
               run: php artisan config:clear
 
             - name: Test with phpunit
-              run: vendor/bin/phpunit --coverage-text
+              run: php artisan test
