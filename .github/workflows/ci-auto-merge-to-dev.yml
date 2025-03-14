@@ -1,9 +1,13 @@
 name: Auto Merge Feature to Dev
 
 on:
-  push:
-    branches:
-      - 'feature/**'
+  workflow_run: 
+    workflows:
+      - "Docker Build test"
+      - "Unit Test"
+      - "Code Quality Test"
+    types:
+      - completed
 
 jobs:
   auto-merge:
@@ -12,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for accurate merge detection
+          fetch-depth: 0
 
       - name: Set up Git config
         run: |

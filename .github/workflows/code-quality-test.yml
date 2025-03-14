@@ -1,4 +1,4 @@
-name: Laravel code quality test
+name: Code quality test
 
 on:
     push:
